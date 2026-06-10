@@ -57,10 +57,3 @@ Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system 
 2. **Run as Administrator** (right-click → Run as Admin)
 3. **Choose tweaks** from the menu
 4. **Enjoy** a faster Windows!
-
-```bash
-# Or build from source
-git clone https://github.com/XfremeDev/Xfreme-Toolbox.git
-cd Xfreme-Toolbox
-pip install -r requirements.txt
-python main.py
