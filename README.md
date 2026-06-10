@@ -1,10 +1,14 @@
 # 🎯 Xfreme Toolbox
 
+👨‍💻 **Author:** XfremeDev
+📧 **Email:** xfremedev@gmail.com
+
+
 ### The Ultimate Windows Optimization Suite
 
 Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system tweaks, software installers, privacy fixes, and performance optimizations in a single executable.
 
-![Screenshot](https://i.imgur.com/your-screenshot.png)
+![Main Menu](docs/images/main-menu.png)
 
 ## ✨ Features
 
@@ -57,3 +61,39 @@ Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system 
 2. **Run as Administrator** (right-click → Run as Admin)
 3. **Choose tweaks** from the menu
 4. **Enjoy** a faster Windows!
+
+---
+
+## 📸 Screenshots
+
+### Main Menu
+![Main Menu](docs/images/main-menu.png)
+
+---
+
+## 📥 Download
+
+[![Download](https://img.shields.io/badge/Download-Latest_Release-red)](https://github.com/XfremeDev/Xfreme-Toolbox/releases/latest)
+
+---
+
+## 🛠️ System Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| OS | Windows 10 / 11 (64-bit) |
+| RAM | 2 GB |
+| Disk Space | 50 MB |
+| Admin Rights | Required |
+
+---
+
+## 📄 License
+
+MIT License © 2026 XfremeDev
+
+---
+
+## ⭐ Support
+
+If you find this tool useful, consider giving it a star on GitHub!
