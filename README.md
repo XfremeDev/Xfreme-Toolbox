@@ -1,4 +1,4 @@
-# 🎯 Xfreme Toolbox - Red Edition
+# 🎯 Xfreme Toolbox
 
 ### The Ultimate Windows Optimization Suite
 
