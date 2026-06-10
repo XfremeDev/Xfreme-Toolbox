@@ -1,14 +1,13 @@
 # 🎯 Xfreme Toolbox
 
 👨‍💻 **Author:** XfremeDev
+
 📧 **Email:** xfremedev@gmail.com
 
 
 ### The Ultimate Windows Optimization Suite
 
 Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system tweaks, software installers, privacy fixes, and performance optimizations in a single executable.
-
-![Main Menu](docs/images/main-menu.png)
 
 ## ✨ Features
 
