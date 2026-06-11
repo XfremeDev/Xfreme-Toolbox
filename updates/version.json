@@ -3,7 +3,7 @@
     "releaseDate": "2026-06-11",
     "updateServer": "https://raw.githubusercontent.com/XfremeDev/Xfreme-Toolbox/main/updates/",
     "changelog": "Added 8 languages, 7 color themes, 27 new apps, auto-update system",
-    "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox",
+    "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.1/XfremeToolbox.exe",
     "files": [
         {
             "name": "XfremeToolbox.exe",
