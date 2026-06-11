@@ -1,4 +1,4 @@
-# 🎯 Xfreme Toolbox
+# 🎯 Xfreme Toolbox v1.1
 
 👨‍💻 **Author:** XfremeDev
 
