@@ -1,4 +1,4 @@
-# 🎯 Xfreme Toolbox v1.1
+# 🎯 Xfreme Toolbox v1.2 Bug Fix
 
 👨‍💻 **Author:** XfremeDev
 
