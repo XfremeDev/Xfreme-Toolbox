@@ -1,14 +1,6 @@
 {
     "version": "1.2",
     "releaseDate": "2026-06-14",
-    "updateServer": "https://raw.githubusercontent.com/XfremeDev/Xfreme-Toolbox/main/updates/",
-    "changelog": "Auto-Update | 8 Languages | 7 Color Themes | Winget Automation | 50+ Installers"
-    "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.1/XfremeToolbox.exe",
-    "files": [
-        {
-            "name": "XfremeToolbox.exe",
-            "size": 18000000,
-            "md5": ""
-        }
-    ]
+    "changelog": "Added winget automation, fixed SSL errors, fixed UWP removal, fixed Stop Updates, improved installer system",
+    "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.2/XfremeToolbox.exe"
 }
