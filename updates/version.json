@@ -1,8 +1,8 @@
 {
-    "version": "1.1",
-    "releaseDate": "2026-06-11",
+    "version": "1.2",
+    "releaseDate": "2026-06-14",
     "updateServer": "https://raw.githubusercontent.com/XfremeDev/Xfreme-Toolbox/main/updates/",
-    "changelog": "Added 8 languages, 7 color themes, 27 new apps, auto-update system",
+    "changelog": "Auto-Update | 8 Languages | 7 Color Themes | Winget Automation | 50+ Installers"
     "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.1/XfremeToolbox.exe",
     "files": [
         {
