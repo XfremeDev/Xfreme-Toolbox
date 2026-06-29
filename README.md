@@ -3,6 +3,9 @@
 [![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![GitHub Releases](https://img.shields.io/github/downloads/XfremeDev/Xfreme-Toolbox/total.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/releases)
+[![VirusTotal](https://img.shields.io/badge/VirusTotal-6%2F70-yellow)](https://www.virustotal.com/gui/file/e827166c3300f22b8a9d19a24a35275e86d456b04a65a5ecaed9fec7fb22d26d)
+[![GitHub stars](https://img.shields.io/github/stars/XfremeDev/Xfreme-Toolbox.svg?style=social)](https://github.com/XfremeDev/Xfreme-Toolbox/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/XfremeDev/Xfreme-Toolbox.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/issues)
 
 👨‍💻 **Author:** XfremeDev  
 📧 **Email:** xfremedev@gmail.com  
@@ -13,6 +16,8 @@
 ### The Ultimate Windows Optimization Suite
 
 Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system tweaks, software installers, privacy fixes, and performance optimizations in a single executable. **Now with automatic updates and winget support!**
+
+> 🔒 **VirusTotal Analysis:** 6/70 detections - **False Positives**. [View Report →](VIRUSTOTAL.md)
 
 ---
 
@@ -119,36 +124,5 @@ The tool will automatically:
 
 ---
 
-## 📸 Screenshots
-
-### Main Menu
+## 🖥️ Main Menu
 ![Main Menu](docs/images/main-menu.png)
-
----
-
-## 📥 Download
-
-[![Download](https://img.shields.io/badge/Download-Latest_Release-red)](https://github.com/XfremeDev/Xfreme-Toolbox/releases/latest)
-
----
-
-## 🛠️ System Requirements
-
-| Requirement | Minimum |
-|-------------|---------|
-| OS | Windows 10 / 11 (64-bit) |
-| RAM | 2 GB |
-| Disk Space | 50 MB |
-| Admin Rights | Required |
-
----
-
-## 📄 License
-
-MIT License © 2026 XfremeDev
-
----
-
-## ⭐ Support
-
-If you find this tool useful, consider giving it a star on GitHub!
