@@ -99,7 +99,5 @@ pyinstaller --onefile --console --name "XfremeToolbox" main.py
 # Готовый файл появится в папке dist/```
 
 
-## 🖥️ Главное меню
 
-![Главное меню](
 
