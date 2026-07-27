@@ -96,8 +96,10 @@ cd Xfreme-Toolbox
 pip install pyinstaller
 # Соберите EXE
 pyinstaller --onefile --console --name "XfremeToolbox" main.py
-# Готовый файл появится в папке dist/
+# Готовый файл появится в папке dist/```
 
-## 🖥️ Main Menu
-![Main Menu](Xfreme-Toolbox
-/main-menu.png)
+
+## 🖥️ Главное меню
+
+![Главное меню](
+
