@@ -1,5 +1,5 @@
 """
-XFREME TOOLBOX v1.3.0 - Professional Windows Optimization Utility
+XFREME TOOLBOX v1.4.0 - Professional Windows Optimization Utility
 Open Source | MIT License | GitHub: XfremeDev/Xfreme-Toolbox
 """
 
@@ -14,13 +14,17 @@ import json
 import tempfile
 import time
 import hashlib
+import glob
+import traceback
+import threading
+import itertools
 from datetime import datetime
 
 # ===================================================================
 # CONSTANTS
 # ===================================================================
 
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 APP_NAME = "Xfreme Toolbox"
 AUTHOR = "XfremeDev"
 LICENSE = "MIT"
@@ -69,6 +73,10 @@ LANGUAGES = {
         "vpn": "VPN Clients",
         "games": "Games & Social",
         "system": "System Runtimes",
+        "office": "Office Suites",
+        "cloud": "Cloud Storage",
+        "network": "Network Tools",
+        "system_tools": "System Tools",
         "check_updates": "Check for Updates",
         "delete_installers": "Delete All Installers",
         "exit": "Exit Toolbox",
@@ -88,7 +96,8 @@ LANGUAGES = {
         "version": "Version",
         "author": "Author",
         "license": "License",
-        "github": "GitHub"
+        "github": "GitHub",
+        "update_check_failed": "Update check failed (network issue). Will try again later."
     },
     "ru": {
         "title": "XFREME TOOLBOX",
@@ -103,6 +112,10 @@ LANGUAGES = {
         "vpn": "VPN клиенты",
         "games": "Игры и соцсети",
         "system": "Системные компоненты",
+        "office": "Офисные пакеты",
+        "cloud": "Облачные хранилища",
+        "network": "Сетевые утилиты",
+        "system_tools": "Системные утилиты",
         "check_updates": "Проверить обновления",
         "delete_installers": "Удалить все установщики",
         "exit": "Выйти",
@@ -122,7 +135,8 @@ LANGUAGES = {
         "version": "Версия",
         "author": "Автор",
         "license": "Лицензия",
-        "github": "GitHub"
+        "github": "GitHub",
+        "update_check_failed": "Не удалось проверить обновления (проблема с сетью). Повторите позже."
     }
 }
 
@@ -184,12 +198,14 @@ def save_color(color_name):
 # LOGGING
 # ===================================================================
 
-def log_action(action, level="INFO"):
+def log_action(action, level="INFO", exc_info=None):
     log_file = os.path.join(LOGS_DIR, f"xfreme_{datetime.now().strftime('%Y%m%d')}.log")
     timestamp = datetime.now().strftime("%H:%M:%S")
     try:
         with open(log_file, 'a', encoding='utf-8') as f:
             f.write(f"[{timestamp}] [{level}] {action}\n")
+            if exc_info:
+                f.write(traceback.format_exc())
     except:
         pass
 
@@ -220,23 +236,17 @@ def clear_screen():
 # ===================================================================
 
 def compare_versions(v1, v2):
-    """Compare version strings like '1.2.3'
-    Returns: -1 if v1 < v2, 0 if equal, 1 if v1 > v2"""
     try:
         v1_parts = [int(x) for x in v1.split('.')]
         v2_parts = [int(x) for x in v2.split('.')]
     except:
-        # If version contains non-numeric characters, compare as strings
         if v1 < v2: return -1
         elif v1 > v2: return 1
         else: return 0
-    
-    # Pad with zeros to same length
     while len(v1_parts) < len(v2_parts):
         v1_parts.append(0)
     while len(v2_parts) < len(v1_parts):
         v2_parts.append(0)
-    
     for i in range(len(v1_parts)):
         if v1_parts[i] < v2_parts[i]:
             return -1
@@ -265,7 +275,7 @@ def save_current_version(version):
     except:
         pass
 
-def check_for_updates():
+def check_for_updates(silent=False):
     p("\n" + "=" * 60)
     p("            CHECKING FOR UPDATES")
     p("=" * 60)
@@ -279,8 +289,7 @@ def check_for_updates():
         req = urllib.request.Request(update_server, headers={
             'User-Agent': f'XfremeToolbox/{VERSION}'
         })
-        
-        with urllib.request.urlopen(req, timeout=10) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:
             data = json.loads(response.read().decode('utf-8'))
             remote_version = data.get('version', '0.0.0')
             release_date = data.get('releaseDate', 'Unknown')
@@ -290,7 +299,6 @@ def check_for_updates():
             print(f"  Remote version:  {remote_version}")
             print(f"  Release date:    {release_date}")
             
-            # Compare versions
             comparison = compare_versions(current_version, remote_version)
             
             if comparison < 0:
@@ -299,7 +307,6 @@ def check_for_updates():
                     print(f"\n  Changes:")
                     for line in changelog.split('\n'):
                         print(f"    • {line.strip()}")
-                
                 print()
                 choice = input(f"{YELLOW}Download and install update? (y/n): {RESET}")
                 if choice.lower() == 'y':
@@ -311,20 +318,18 @@ def check_for_updates():
                 else:
                     yellow_print("  Update skipped.")
                     return False
-                    
             elif comparison == 0:
                 green_print(f"\n  ✓ Xfreme Toolbox is up to date! (v{current_version})")
                 return True
             else:
                 yellow_print(f"\n  ⚠ You are running a newer version than available!")
                 return True
-            
     except urllib.error.URLError as e:
-        red_print(f"\n  ✗ Network error: Could not reach update server")
-        red_print(f"    {e}")
-        return False
-    except json.JSONDecodeError as e:
-        red_print(f"\n  ✗ Invalid response from update server")
+        if silent:
+            yellow_print(f"\n  ⚠ {t('update_check_failed')}")
+        else:
+            red_print(f"\n  ✗ Network error: Could not reach update server")
+            red_print(f"    {e}")
         return False
     except Exception as e:
         red_print(f"\n  ✗ Failed to check updates: {e}")
@@ -349,7 +354,6 @@ def download_and_install_update(download_url, new_version):
     print(f"  From: {download_url}")
     
     try:
-        # Download with progress bar
         def report_progress(block_num, block_size, total_size):
             if total_size > 0:
                 percent = int(block_num * block_size * 100 / total_size)
@@ -364,35 +368,24 @@ def download_and_install_update(download_url, new_version):
         print()
         green_print("  ✓ Download complete!")
         
-        # Verify downloaded file exists and has reasonable size
         if not os.path.exists(new_exe_path) or os.path.getsize(new_exe_path) < 100000:
             red_print("  ✗ Downloaded file is invalid or too small")
             return False
         
-        # Create update script
         bat_path = os.path.join(temp_dir, "update_xfreme.bat")
         bat_content = f'''@echo off
 echo Updating Xfreme Toolbox...
 timeout /t 2 /nobreak >nul
-
-:: Copy new version
 copy /y "{new_exe_path}" "{current_exe}"
 if errorlevel 1 (
     echo Failed to copy update!
     pause
     exit /b 1
 )
-
-:: Save version info
 echo {new_version} > "{VERSION_FILE}"
-
-:: Start updated application
 start "" "{current_exe}"
-
-:: Clean up
 del "{new_exe_path}" 2>nul
 del "%~f0" 2>nul
-
 echo Update complete!
 exit
 '''
@@ -401,34 +394,40 @@ exit
         
         green_print("  ✓ Update ready!")
         print("\n  Restarting to apply update...")
-        
-        # Run update script
         subprocess.Popen([bat_path], shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        
-        # Save version info before exit
         save_current_version(new_version)
-        
-        # Exit current instance
         time.sleep(1)
         sys.exit(0)
-        
     except Exception as e:
         red_print(f"  ✗ Update failed: {e}")
         return False
 
 # ===================================================================
-# WINGET CHECK
+# SPINNER (прогресс-бар)
+# ===================================================================
+
+def show_spinner(stop_event, message="Installing..."):
+    """Display a spinning animation while a process is running."""
+    spinner = itertools.cycle(['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'])
+    while not stop_event.is_set():
+        sys.stdout.write(f'\r{next(spinner)} {message}')
+        sys.stdout.flush()
+        time.sleep(0.3)
+    sys.stdout.write('\r✅ Done!                    \n')
+    sys.stdout.flush()
+
+# ===================================================================
+# WINGET (без shell=True, с прогрессом)
 # ===================================================================
 
 def check_winget():
-    """Check if winget is available"""
     try:
         result = subprocess.run(
-            ['winget', '--version'], 
-            capture_output=True, 
-            text=True, 
-            encoding='utf-8', 
-            errors='ignore', 
+            ['winget', '--version'],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
             timeout=5
         )
         return result.returncode == 0
@@ -436,7 +435,6 @@ def check_winget():
         return False
 
 def get_winget_id(program_key):
-    """Get winget ID for program"""
     winget_ids = {
         "chrome": "Google.Chrome",
         "firefox": "Mozilla.Firefox",
@@ -486,80 +484,278 @@ def get_winget_id(program_key):
         "epic": "EpicGames.EpicGamesLauncher",
         "gog": "GOG.Galaxy",
         "vcredist": "Microsoft.VCRedist.2015+.x64",
-        "directx": "Microsoft.DirectX"
+        "directx": "Microsoft.DirectX",
+        "libreoffice": "TheDocumentFoundation.LibreOffice",
+        "onlyoffice": "ONLYOFFICE.DesktopEditors",
+        "wps": "Kingsoft.WPSOffice",
+        "dropbox": "Dropbox.Dropbox",
+        "googledrive": "Google.Drive",
+        "mega": "Mega.Mega",
+        "putty": "PuTTY.PuTTY",
+        "winscp": "WinSCP.WinSCP",
+        "filezilla": "FileZilla.Client",
+        "procexp": "Microsoft.Sysinternals.ProcessExplorer",
+        "autoruns": "Microsoft.Sysinternals.Autoruns",
     }
     return winget_ids.get(program_key, None)
 
 def install_with_winget(program_key):
-    """Install program using winget"""
+    """Install program using winget with a spinner."""
     winget_id = get_winget_id(program_key)
     if not winget_id:
         red_print(f"  ✗ No winget ID found for: {program_key}")
         return False
-    
+
     print(f"\n  Installing via winget: {winget_id}")
-    
+
     try:
-        # Check if already installed
-        check_cmd = f'winget list --id "{winget_id}"'
+        # Проверка, установлено ли уже
         check_result = subprocess.run(
-            check_cmd, 
-            shell=True, 
-            capture_output=True, 
-            text=True, 
-            encoding='utf-8', 
+            ['winget', 'list', '--id', winget_id],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
             errors='ignore',
             timeout=30
         )
-        
         if winget_id in check_result.stdout:
             yellow_print(f"  ⚠ Already installed: {winget_id}")
             return True
-        
-        # Install via winget
-        install_cmd = f'winget install --id "{winget_id}" --silent --accept-package-agreements --accept-source-agreements'
-        
-        print(f"  Installing...")
-        result = subprocess.run(
-            install_cmd, 
-            shell=True, 
-            capture_output=True, 
-            text=True, 
-            encoding='utf-8', 
-            errors='ignore',
-            timeout=600
+
+        # Запускаем установку с показом спиннера
+        install_cmd = [
+            'winget', 'install', '--id', winget_id,
+            '--silent', '--accept-package-agreements', '--accept-source-agreements'
+        ]
+
+        print(f"  ⏳ Installation in progress (may take several minutes)...")
+        stop_spinner = threading.Event()
+        spinner_thread = threading.Thread(
+            target=show_spinner,
+            args=(stop_spinner, f"Installing {winget_id}...")
         )
-        
-        if result.returncode == 0:
-            green_print(f"  ✓ Installed successfully")
+        spinner_thread.start()
+
+        # Запускаем процесс
+        process = subprocess.Popen(
+            install_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding='utf-8',
+            errors='ignore'
+        )
+
+        # Ожидаем завершения с таймаутом 10 минут
+        try:
+            stdout, stderr = process.communicate(timeout=600)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            stdout, stderr = process.communicate()
+            stop_spinner.set()
+            spinner_thread.join()
+            red_print("  ✗ Installation timeout (10 minutes)")
+            return False
+
+        # Останавливаем спиннер
+        stop_spinner.set()
+        spinner_thread.join()
+
+        if process.returncode == 0:
+            green_print("  ✓ Installed successfully")
             log_action(f"Installed {program_key} via winget")
             return True
         else:
-            # Check again if installed
+            # Проверяем ещё раз, возможно уже установлено
             check_result = subprocess.run(
-                check_cmd, 
-                shell=True, 
-                capture_output=True, 
-                text=True, 
-                encoding='utf-8', 
+                ['winget', 'list', '--id', winget_id],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
                 errors='ignore',
                 timeout=30
             )
             if winget_id in check_result.stdout:
                 green_print(f"  ✓ Already installed: {winget_id}")
                 return True
-            
-            red_print(f"  ✗ Installation failed")
-            if result.stderr:
-                print(f"  Error: {result.stderr[:200]}")
+
+            red_print(f"  ✗ Installation failed (return code {process.returncode})")
+            if stderr:
+                print(f"  Error: {stderr[:200]}")
             log_action(f"Winget install failed for {program_key}", "ERROR")
             return False
-            
-    except subprocess.TimeoutExpired:
-        red_print("  ✗ Installation timeout")
-        return False
+
     except Exception as e:
         red_print(f"  ✗ Installation error: {str(e)[:100]}")
+        log_action(f"Winget exception for {program_key}", "ERROR", exc_info=True)
+        return False
+
+# ===================================================================
+# CHOCOLATEY (с прогрессом)
+# ===================================================================
+
+def check_choco():
+    try:
+        result = subprocess.run(
+            ['choco', '--version'],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=5
+        )
+        return result.returncode == 0
+    except:
+        return False
+
+def get_choco_id(program_key):
+    choco_ids = {
+        "chrome": "googlechrome",
+        "firefox": "firefox",
+        "brave": "brave",
+        "librewolf": "librewolf",
+        "vivaldi": "vivaldi",
+        "tor": "tor-browser",
+        "opera": "opera",
+        "vlc": "vlc",
+        "mpchc": "mpc-hc",
+        "audacity": "audacity",
+        "aimp": "aimp",
+        "foobar2000": "foobar2000",
+        "klite": "klitecodecpack",
+        "7zip": "7zip",
+        "cpuz": "cpuz",
+        "gpuz": "gpuz",
+        "crystaldisk": "crystaldiskinfo",
+        "hwmonitor": "hwmonitor",
+        "msiafterburner": "msiafterburner",
+        "rufus": "rufus",
+        "ventoy": "ventoy",
+        "vscode": "vscode",
+        "git": "git",
+        "nodejs": "nodejs",
+        "docker": "docker-desktop",
+        "python": "python",
+        "notepadpp": "notepadplusplus",
+        "sdi": "sdi",
+        "handbrake": "handbrake",
+        "obs": "obs-studio",
+        "shotcut": "shotcut",
+        "davinci": "davinci-resolve",
+        "gimp": "gimp",
+        "imageglass": "imageglass",
+        "protonvpn": "protonvpn",
+        "nordvpn": "nordvpn",
+        "expressvpn": "expressvpn",
+        "wireguard": "wireguard",
+        "openvpn": "openvpn",
+        "minecraft": "minecraft",
+        "roblox": "roblox",
+        "discord": "discord",
+        "teamspeak": "teamspeak",
+        "playnite": "playnite",
+        "steam": "steam",
+        "epic": "epicgameslauncher",
+        "gog": "goggalaxy",
+        "vcredist": "vcredist-all",
+        "directx": "directx",
+        "libreoffice": "libreoffice",
+        "onlyoffice": "onlyoffice",
+        "wps": "wps-office",
+        "dropbox": "dropbox",
+        "googledrive": "googledrive",
+        "mega": "mega",
+        "putty": "putty",
+        "winscp": "winscp",
+        "filezilla": "filezilla",
+        "procexp": "procexp",
+        "autoruns": "autoruns",
+        "ddu": "ddu"
+    }
+    return choco_ids.get(program_key, None)
+
+def install_with_choco(program_key):
+    """Install program using Chocolatey with a spinner."""
+    choco_id = get_choco_id(program_key)
+    if not choco_id:
+        red_print(f"  ✗ No Chocolatey package found for: {program_key}")
+        return False
+
+    print(f"\n  Installing via Chocolatey: {choco_id}")
+
+    try:
+        # Проверка, установлено ли уже
+        check_result = subprocess.run(
+            ['choco', 'list', '--idonly', '--exact', choco_id],
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='ignore',
+            timeout=30
+        )
+        if choco_id in check_result.stdout:
+            yellow_print(f"  ⚠ Already installed: {choco_id}")
+            return True
+
+        install_cmd = ['choco', 'install', choco_id, '-y', '--no-progress']
+
+        print(f"  ⏳ Installation in progress (may take several minutes)...")
+        stop_spinner = threading.Event()
+        spinner_thread = threading.Thread(
+            target=show_spinner,
+            args=(stop_spinner, f"Installing {choco_id}...")
+        )
+        spinner_thread.start()
+
+        process = subprocess.Popen(
+            install_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding='utf-8',
+            errors='ignore'
+        )
+
+        try:
+            stdout, stderr = process.communicate(timeout=900)  # 15 минут
+        except subprocess.TimeoutExpired:
+            process.kill()
+            stdout, stderr = process.communicate()
+            stop_spinner.set()
+            spinner_thread.join()
+            red_print("  ✗ Installation timeout (15 minutes)")
+            return False
+
+        stop_spinner.set()
+        spinner_thread.join()
+
+        if process.returncode == 0:
+            green_print("  ✓ Installed successfully")
+            log_action(f"Installed {program_key} via Chocolatey")
+            return True
+        else:
+            # Повторная проверка
+            check_result = subprocess.run(
+                ['choco', 'list', '--idonly', '--exact', choco_id],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='ignore',
+                timeout=30
+            )
+            if choco_id in check_result.stdout:
+                green_print(f"  ✓ Already installed: {choco_id}")
+                return True
+
+            red_print(f"  ✗ Installation failed (return code {process.returncode})")
+            if stderr:
+                print(f"  Error: {stderr[:200]}")
+            log_action(f"Choco install failed for {program_key}", "ERROR")
+            return False
+
+    except Exception as e:
+        red_print(f"  ✗ Installation error: {str(e)[:100]}")
+        log_action(f"Choco exception for {program_key}", "ERROR", exc_info=True)
         return False
 
 # ===================================================================
@@ -574,14 +770,14 @@ class InstallStats:
         self.skipped = 0
         self.current = 0
         self.start_time = None
-    
+
     def start(self):
         self.start_time = datetime.now()
         log_action("Installation started")
-    
+
     def finish(self):
         log_action(f"Installation finished. Success: {self.success}, Failed: {self.failed}")
-    
+
     def get_time_elapsed(self):
         if self.start_time:
             delta = datetime.now() - self.start_time
@@ -610,7 +806,8 @@ def reg_set(path, name, value, reg_type=winreg.REG_DWORD, hive=winreg.HKEY_LOCAL
         winreg.SetValueEx(key, name, 0, reg_type, value)
         winreg.CloseKey(key)
         return True
-    except:
+    except Exception as e:
+        log_action(f"Registry set failed: {path}\\{name} = {value} - {str(e)}", "ERROR", exc_info=True)
         return False
 
 # ===================================================================
@@ -623,44 +820,27 @@ def quick_setup():
     p("=" * 60)
     print("  Applying 10+ tweaks for better performance and privacy...")
     log_action("Quick Windows Setup started")
-    
+
     applied = 0
-    
-    try:
-        reg_set(r"SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0)
+    if reg_set(r"SOFTWARE\Policies\Microsoft\Windows\DataCollection", "AllowTelemetry", 0):
         applied += 1
-    except: pass
-    
-    try:
-        reg_set(r"SOFTWARE\Policies\Microsoft\Windows\Windows Search", "AllowCortana", 0)
+    if reg_set(r"SOFTWARE\Policies\Microsoft\Windows\Windows Search", "AllowCortana", 0):
         applied += 1
-    except: pass
-    
-    try:
-        reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", "AppCaptureEnabled", 0)
+    if reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", "AppCaptureEnabled", 0):
         applied += 1
-    except: pass
-    
-    try:
-        reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Hidden", 1, winreg.REG_DWORD, winreg.HKEY_CURRENT_USER)
+    if reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "Hidden", 1, winreg.REG_DWORD, winreg.HKEY_CURRENT_USER):
         applied += 1
-    except: pass
-    
-    try:
-        reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "HideFileExt", 0, winreg.REG_DWORD, winreg.HKEY_CURRENT_USER)
+    if reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced", "HideFileExt", 0, winreg.REG_DWORD, winreg.HKEY_CURRENT_USER):
         applied += 1
-    except: pass
-    
-    try:
-        reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications", "ToastEnabled", 0)
+    if reg_set(r"SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications", "ToastEnabled", 0):
         applied += 1
-    except: pass
-    
+
     try:
         shutil.rmtree(os.environ.get('TEMP', ''), ignore_errors=True)
         applied += 1
-    except: pass
-    
+    except Exception as e:
+        log_action(f"Failed to clean TEMP: {e}", "ERROR")
+
     green_print(f"\n  ✓ {t('applied')} {applied} {t('tweaks')}")
     log_action(f"Quick setup completed, {applied} tweaks applied")
     print("\n  Restart Explorer to apply changes.")
@@ -671,35 +851,38 @@ def quick_setup():
 # ===================================================================
 
 def install_program(key):
-    """Install program using winget"""
     if key not in PROGRAMS:
         red_print(f"  Unknown program: {key}")
         return False
-    
-    program = PROGRAMS[key]
-    name = program["name"]
-    
+
+    name = PROGRAMS[key]["name"]
     print(f"\n[{stats.current}/{stats.total}] 📦 {name}")
     log_action(f"Installing {name}")
-    
-    # Check winget
-    if not check_winget():
-        red_print("  ✗ Winget not found! Please install Windows Package Manager.")
-        red_print("  Download: https://aka.ms/getwinget")
-        log_action("Winget not found", "ERROR")
-        stats.failed += 1
-        return False
-    
-    # Install via winget
-    success = install_with_winget(key)
-    
-    if success:
-        stats.success += 1
-        log_action(f"Installed {name}")
-        return True
+
+    if check_winget():
+        success = install_with_winget(key)
+        if success:
+            stats.success += 1
+            return True
+        else:
+            stats.failed += 1
+            return False
     else:
-        stats.failed += 1
-        return False
+        yellow_print("  Winget not available, trying Chocolatey...")
+        if check_choco():
+            success = install_with_choco(key)
+            if success:
+                stats.success += 1
+                return True
+            else:
+                stats.failed += 1
+                return False
+        else:
+            red_print("  ✗ No package manager found! Please install winget or Chocolatey.")
+            red_print("  Winget: https://aka.ms/getwinget")
+            red_print("  Chocolatey: https://chocolatey.org/install")
+            stats.failed += 1
+            return False
 
 def show_category_menu(category_name, program_keys):
     while True:
@@ -707,18 +890,18 @@ def show_category_menu(category_name, program_keys):
         p("=" * 60)
         p(f"            {category_name}")
         p("=" * 60)
-        
+
         for i, key in enumerate(program_keys, 1):
             name = PROGRAMS[key]["name"]
             print(f"  {i}. {name}")
-        
+
         print("-" * 60)
         print(f"  a. {t('install_all')}")
         print(f"  0. {t('back')}")
         p("=" * 60)
-        
+
         choice = input(f"{RED}{t('select_option')}: {RESET}")
-        
+
         if choice == '0':
             break
         elif choice.lower() == 'a':
@@ -752,8 +935,34 @@ def show_category_menu(category_name, program_keys):
 
 def delete_all_installers():
     p("\n[00] DELETE ALL INSTALLERS")
-    yellow_print("⚠ Winget doesn't store installer files locally.")
-    green_print("  No installers to delete.")
+
+    if check_winget():
+        try:
+            subprocess.run(['winget', 'cache', 'clean'], capture_output=True, timeout=30)
+            green_print("  ✓ Winget cache cleaned.")
+        except Exception as e:
+            red_print(f"  ✗ Failed to clean winget cache: {e}")
+    else:
+        yellow_print("  ⚠ Winget not found, skipping cache clean.")
+
+    temp_dir = tempfile.gettempdir()
+    pattern = os.path.join(temp_dir, "*xfreme*")
+    removed = 0
+    for path in glob.glob(pattern, recursive=False):
+        try:
+            if os.path.isfile(path):
+                os.remove(path)
+            elif os.path.isdir(path):
+                shutil.rmtree(path, ignore_errors=True)
+            removed += 1
+        except Exception as e:
+            log_action(f"Failed to delete temp item {path}: {e}", "ERROR")
+
+    if removed:
+        green_print(f"  ✓ Removed {removed} temporary items containing 'xfreme'.")
+    else:
+        yellow_print("  ℹ No temporary Xfreme files found.")
+
     input(f"{RED}{t('press_enter')}{RESET}")
 
 # ===================================================================
@@ -770,9 +979,9 @@ def settings_menu():
         p(f" 2. 🎨 {t('color')}")
         p(f" 0. {t('back')}")
         p("=" * 60)
-        
+
         choice = input(f"{RED}{t('select_option')}: {RESET}")
-        
+
         if choice == '1':
             language_menu()
         elif choice == '2':
@@ -792,9 +1001,9 @@ def language_menu():
     p(" 2. Русский")
     p(" 0. Back")
     p("=" * 60)
-    
+
     choice = input(f"{RED}{t('select_option')}: {RESET}")
-    
+
     if choice == '1':
         save_language("en")
         green_print("✓ Language changed to English")
@@ -822,9 +1031,9 @@ def color_menu():
     p(" 7. ⚪ White")
     p(" 0. Back")
     p("=" * 60)
-    
+
     choice = input(f"{RED}{t('select_option')}: {RESET}")
-    
+
     colors = {
         "1": "red",
         "2": "green",
@@ -834,7 +1043,7 @@ def color_menu():
         "6": "cyan",
         "7": "white"
     }
-    
+
     if choice in colors:
         save_color(colors[choice])
         green_print(f"✓ Color changed")
@@ -872,11 +1081,11 @@ def show_main_menu():
     p(f" User: {os.getlogin()} | PC: {os.environ.get('COMPUTERNAME', 'Unknown')}")
     p(f" Time: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}")
     p("=" * 60)
-    
-    # Check winget status
+
     winget_status = "✅" if check_winget() else "❌"
-    print(f"  Winget: {winget_status}")
-    
+    choco_status = "✅" if check_choco() else "❌"
+    print(f"  Winget: {winget_status}  Chocolatey: {choco_status}")
+
     print()
     p(f"  {t('main_menu')}")
     print("-" * 60)
@@ -890,9 +1099,15 @@ def show_main_menu():
     p(f"  8.  {t('vpn')}")
     p(f"  9.  {t('games')}")
     p(f"  10. {t('system')}")
+    print("-" * 60)
     p(f"  11. {t('check_updates')}")
     p(f"  12. {t('settings')}")
     p(f"  13. {t('about')}")
+    print("-" * 60)
+    p(f"  14. {t('office')}")
+    p(f"  15. {t('cloud')}")
+    p(f"  16. {t('network')}")
+    p(f"  17. {t('system_tools')}")
     print("-" * 60)
     p(f"  00. {t('delete_installers')}")
     p(f"  99. {t('exit')}")
@@ -951,7 +1166,19 @@ PROGRAMS = {
     "epic": {"name": "Epic Games Launcher"},
     "gog": {"name": "GOG Galaxy"},
     "vcredist": {"name": "Visual C++ Redistributables AIO"},
-    "directx": {"name": "DirectX Runtime"}
+    "directx": {"name": "DirectX Runtime"},
+    "libreoffice": {"name": "LibreOffice"},
+    "onlyoffice": {"name": "OnlyOffice"},
+    "wps": {"name": "WPS Office"},
+    "dropbox": {"name": "Dropbox"},
+    "googledrive": {"name": "Google Drive"},
+    "mega": {"name": "Mega"},
+    "putty": {"name": "PuTTY"},
+    "winscp": {"name": "WinSCP"},
+    "filezilla": {"name": "FileZilla"},
+    "procexp": {"name": "Process Explorer"},
+    "autoruns": {"name": "Autoruns"},
+    "ddu": {"name": "Display Driver Uninstaller (DDU)"}
 }
 
 # ===================================================================
@@ -963,20 +1190,25 @@ def main():
     create_directories()
     load_language()
     load_color()
-    
-    # Check winget
-    if not check_winget():
-        yellow_print("\n  ⚠ Winget not found! Please install Windows Package Manager.")
-        yellow_print("  Download: https://aka.ms/getwinget")
+
+    if not check_winget() and not check_choco():
+        yellow_print("\n  ⚠ Neither winget nor Chocolatey found!")
+        yellow_print("  Please install at least one package manager.")
+        yellow_print("  Winget: https://aka.ms/getwinget")
+        yellow_print("  Chocolatey: https://chocolatey.org/install")
         print()
-    
-    # Check for updates
-    check_for_updates()
-    
+    else:
+        if not check_winget():
+            yellow_print("\n  ⚠ Winget not found, but Chocolatey is available. Will use Chocolatey.")
+        elif not check_choco():
+            yellow_print("\n  ⚠ Chocolatey not found, but winget is available. Will use winget.")
+
+    check_for_updates(silent=True)
+
     while True:
         show_main_menu()
         choice = input(f"{RED}{t('select_option')}: {RESET}")
-        
+
         if choice == '1':
             quick_setup()
         elif choice == '2':
@@ -998,11 +1230,19 @@ def main():
         elif choice == '10':
             show_category_menu(t('system'), ["vcredist", "directx"])
         elif choice == '11':
-            check_for_updates()
+            check_for_updates(silent=False)
         elif choice == '12':
             settings_menu()
         elif choice == '13':
             about_menu()
+        elif choice == '14':
+            show_category_menu(t('office'), ["libreoffice", "onlyoffice", "wps"])
+        elif choice == '15':
+            show_category_menu(t('cloud'), ["dropbox", "googledrive", "mega"])
+        elif choice == '16':
+            show_category_menu(t('network'), ["putty", "winscp", "filezilla"])
+        elif choice == '17':
+            show_category_menu(t('system_tools'), ["procexp", "autoruns", "ddu"])
         elif choice == '00':
             delete_all_installers()
         elif choice == '99':
@@ -1011,7 +1251,7 @@ def main():
             break
         else:
             yellow_print(t('unknown'))
-        
+
         input(f"{RED}{t('press_enter')}{RESET}")
 
 if __name__ == "__main__":
