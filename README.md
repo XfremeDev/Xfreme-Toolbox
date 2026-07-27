@@ -1,128 +1,102 @@
-# 🎯 Xfreme Toolbox v1.3.0
+# 🛠️ Xfreme Toolbox v1.4.0
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/releases)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![GitHub Releases](https://img.shields.io/github/downloads/XfremeDev/Xfreme-Toolbox/total.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/releases)
-[![VirusTotal](https://img.shields.io/badge/VirusTotal-6%2F70-yellow)](https://www.virustotal.com/gui/file/e827166c3300f22b8a9d19a24a35275e86d456b04a65a5ecaed9fec7fb22d26d)
-[![GitHub stars](https://img.shields.io/github/stars/XfremeDev/Xfreme-Toolbox.svg?style=social)](https://github.com/XfremeDev/Xfreme-Toolbox/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/XfremeDev/Xfreme-Toolbox.svg)](https://github.com/XfremeDev/Xfreme-Toolbox/issues)
+**Xfreme Toolbox** – это портативная консольная утилита для комплексной оптимизации Windows, автоматической установки популярного ПО и применения системных твиков. Работает через `winget` и `Chocolatey`, имеет встроенную систему автообновления и поддерживает два языка (русский/английский).
 
-👨‍💻 **Author:** XfremeDev  
-📧 **Email:** xfremedev@gmail.com  
-🌐 **GitHub:** [XfremeDev/Xfreme-Toolbox](https://github.com/XfremeDev/Xfreme-Toolbox)
+![Version](https://img.shields.io/badge/version-1.4.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![GitHub Releases](https://img.shields.io/github/downloads/XfremeDev/Xfreme-Toolbox/total)
+![GitHub stars](https://img.shields.io/github/stars/XfremeDev/Xfreme-Toolbox)
 
 ---
 
-### The Ultimate Windows Optimization Suite
+## 📌 Оглавление
 
-Xfreme Toolbox is a powerful, portable Windows utility that combines 50+ system tweaks, software installers, privacy fixes, and performance optimizations in a single executable. **Now with automatic updates and winget support!**
-
-> 🔒 **VirusTotal Analysis:** 6/70 detections - **False Positives**. [View Report →](VIRUSTOTAL.md)
-
----
-
-## ✨ Features
-
-### 🚀 New in v1.3.0
-- **Winget Integration** - Install software using Windows Package Manager
-- **Auto-Update System** - Automatic updates with progress bar
-- **Fixed Unicode Encoding** - No more encoding errors
-- **Improved Menu Interface** - Clean and organized
-- **Installation Statistics** - Track installation progress
-- **Better Error Handling** - Clear error messages
-
-### 🔧 System Tweaks
-- Disable Action Center, Cortana, Notifications
-- Stop Windows Updates
-- Clear Event Logs & Update Cache
-- Hibernation, Fastboot, Sleep mode control
-- Pagefile (Virtual Memory) management
-- Compact OS / LZX compression
-- Take Ownership context menu
-- DNS Flush and Network Reset
-
-### 📦 Software Installers via Winget
-**Browsers:**
-- Google Chrome, Mozilla Firefox, Brave
-- LibreWolf, Vivaldi, Tor Browser, Opera GX
-
-**Media:**
-- VLC Media Player, MPC-HC
-- Audacity, AIMP, Foobar2000
-- K-Lite Codec Pack
-
-**Utilities:**
-- 7-Zip, CPU-Z, GPU-Z
-- CrystalDiskInfo, HWMonitor
-- MSI Afterburner, Rufus, Ventoy
-
-**Development:**
-- Visual Studio Code, Git
-- Node.js LTS, Docker Desktop
-- Python 3.12, Notepad++, SDI
-
-**Video Editing:**
-- HandBrake, OBS Studio
-- Shotcut, DaVinci Resolve
-
-**Photo Editing:**
-- GIMP, ImageGlass
-
-**VPN Clients:**
-- ProtonVPN, NordVPN
-- ExpressVPN, WireGuard, OpenVPN
-
-**Games & Social:**
-- Minecraft Launcher, Roblox
-- Discord, TeamSpeak
-- Playnite, Steam
-- Epic Games Launcher, GOG Galaxy
-
-**System Runtimes:**
-- Visual C++ Redistributables AIO
-- DirectX Runtime
-
-### 🎮 Gaming Optimizations
-- Game Mode toggle
-- Ultimate Performance power plan
-- Disable Nagle's Algorithm (reduce ping)
-- Hardware Accelerated GPU Scheduling
-- Game clients installation
-
-### 🎨 Personalization
-- Dark/Light mode switch
-- Windows 11 context menu restore
-- Disable rounded corners
-- Sound enhancements
-- CMD color schemes
-- Custom console colors
-
-### 🌍 Multi-Language Support
-- English
-- Русский (Russian)
+- [Основные возможности](#-основные-возможности)
+- [Что нового в v1.4.0](#-что-нового-в-v140)
+- [Системные требования](#-системные-требования)
+- [Установка и запуск](#-установка-и-запуск)
+- [Главное меню](#-главное-меню)
+- [Полный список программ](#-полный-список-программ)
+- [Настройки](#-настройки)
+- [Автообновление](#-автообновление)
+- [Разработка и сборка](#-разработка-и-сборка)
+- [Лицензия](#-лицензия)
+- [Контакты](#-контакты)
 
 ---
 
-## 🚀 Quick Start
+## ✨ Основные возможности
 
-### Installation
-1. **Download** the latest `XfremeToolbox.exe` from [Releases](https://github.com/XfremeDev/Xfreme-Toolbox/releases)
-2. **Run as Administrator** (right-click → Run as Admin)
-3. **Select tweaks** from the main menu
-4. **Enjoy** a faster Windows!
+### 🧹 Оптимизация системы
+- Отключение телеметрии, Кортаны, GameDVR, уведомлений
+- Очистка временных файлов и кэша обновлений
+- Настройка скрытых файлов и расширений
+- Быстрое применение 10+ твиков одним нажатием
 
-### Requirements
-- Windows Package Manager (winget) - auto-installed with Windows 11, or [download here](https://aka.ms/getwinget)
-- Administrative privileges
+### 📦 Установка ПО (через winget / Chocolatey)
+- **Автоматическое переключение** между пакетными менеджерами
+- Более **50 программ** в 12 категориях
+- **Анимированный спиннер** – вы видите, что установка идёт
+- Поддержка тихой установки (`--silent`)
 
-### First Run
-The tool will automatically:
-1. Check for updates
-2. Verify winget installation
-3. Load your language and color preferences
-4. Show the main menu
+### 🌍 Мультиязычность
+- Русский и английский интерфейс
+- Язык сохраняется в конфигурационном файле
+
+### 🎨 Настройка внешнего вида
+- 7 цветовых схем консоли (красный, зелёный, жёлтый, синий, фиолетовый, голубой, белый)
+
+### 🔄 Автообновление
+- Проверка новой версии при запуске
+- Скачивание и автоматическая замена исполняемого файла
+- Отображение изменений (changelog)
 
 ---
+
+## 🆕 Что нового в v1.4.0
+
+| Нововведение | Описание |
+|--------------|----------|
+| 🌀 **Анимированный спиннер** | При установке программ теперь крутится индикатор, показывающий, что процесс не завис. |
+| 🍫 **Поддержка Chocolatey** | Если `winget` не найден, Toolbox автоматически использует Chocolatey (при его наличии). |
+| 📂 **Новые категории** | Добавлены: **Офисные пакеты**, **Облачные хранилища**, **Сетевые утилиты**, **Системные утилиты**. |
+| 📦 **Новые программы** | LibreOffice, OnlyOffice, WPS Office, Dropbox, Google Drive, Mega, PuTTY, WinSCP, FileZilla, Process Explorer, Autoruns, DDU. |
+| 🔧 **Улучшения безопасности** | Отказ от `shell=True` в вызовах subprocess (переход на списки аргументов). |
+| 📝 **Расширенное логирование** | Ошибки реестра и исключения теперь записываются с полным стеком вызовов. |
+| ⏱️ **Ускорение проверки обновлений** | Таймаут уменьшен с 10 до 5 секунд; при отсутствии интернета проверка пропускается без зависания. |
+| 🧹 **Очистка временных папок** | При удалении установщиков удаляются также папки/файлы, содержащие `xfreme` в `%TEMP%`. |
+
+---
+
+## 💻 Системные требования
+
+- **ОС**: Windows 10 / 11 (x64)
+- **Права**: Администратор (программа сама запросит повышение)
+- **Пакетный менеджер** (хотя бы один):
+  - [winget](https://aka.ms/getwinget) (встроен в Windows 11, для Windows 10 устанавливается отдельно)
+  - [Chocolatey](https://chocolatey.org/install) (опционально, как резерв)
+- **Python** (только для разработки/сборки, не требуется для работы EXE)
+
+---
+
+## 🚀 Установка и запуск
+
+### Для пользователей (готовый EXE)
+1. Скачайте последний **XfremeToolbox.exe** со [страницы релизов](https://github.com/XfremeDev/Xfreme-Toolbox/releases).
+2. Запустите файл **от имени администратора** (правой кнопкой → «Запуск от имени администратора»).
+3. Следуйте инструкциям в консоли.
+
+> **Примечание:** При первом запуске Toolbox создаёт папку `C:\XfremeToolbox` для логов и настроек.
+
+### Для разработчиков (сборка из исходников)
+```bash
+git clone https://github.com/XfremeDev/Xfreme-Toolbox.git
+cd Xfreme-Toolbox
+# Установите PyInstaller
+pip install pyinstaller
+# Соберите EXE
+pyinstaller --onefile --console --name "XfremeToolbox" main.py
+# Готовый файл появится в папке dist/
 
 ## 🖥️ Main Menu
-![Main Menu](docs/images/main-menu.png)
+![Main Menu](main-menu.png)
