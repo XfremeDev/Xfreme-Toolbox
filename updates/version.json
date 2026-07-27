@@ -1,6 +1,6 @@
 {
-    "version": "1.3.0",
-    "releaseDate": "2026-06-29",
-    "changelog": "fixed winget, fixed Unicode encoding errors, improved menu interface, added installation statistics, fixed Steam and other installations via winget",
-    "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.3.0/XfremeToolbox.exe"
+  "version": "1.4.0",
+  "releaseDate": "2026-07-27",
+  "changelog": "Added animated progress spinner for installations; Added Chocolatey support as fallback package manager; Added new categories: Office Suites, Cloud Storage, Network Tools, System Tools; Added programs: LibreOffice, OnlyOffice, WPS Office, Dropbox, Google Drive, Mega, PuTTY, WinSCP, FileZilla, Process Explorer, Autoruns, DDU; Fixed registry error logging; Removed shell=True for security; Reduced update timeout to 5s; Clean temp folders with 'xfreme' pattern",
+  "downloadUrl": "https://github.com/XfremeDev/Xfreme-Toolbox/releases/download/v1.4.0/XfremeToolbox.exe"
 }
