@@ -1,5 +1,8 @@
 # 🛠️ Xfreme Toolbox v1.4.0
 
+![Главное меню](https://raw.githubusercontent.com/XfremeDev/Xfreme-Toolbox/main/images/main_menu.png)
+
+
 **Xfreme Toolbox** – это портативная консольная утилита для комплексной оптимизации Windows, автоматической установки популярного ПО и применения системных твиков. Работает через `winget` и `Chocolatey`, имеет встроенную систему автообновления и поддерживает два языка (русский/английский).
 
 ![Version](https://img.shields.io/badge/version-1.4.0-blue)
